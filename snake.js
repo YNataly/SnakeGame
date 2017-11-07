@@ -325,7 +325,7 @@ class Game {
             if(this.round===this.roundsNumber) { //saveYourName
                 return;}
             
-            if (this.roundStartInterval>=600) this.roundStartInterval-=20;} 
+            if (this.roundStartInterval>=600) this.roundStartInterval-=10;} 
 
         document.addEventListener("keydown", this.EnterKeyHandler);
         this.cont.classList.remove("hide");
