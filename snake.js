@@ -550,7 +550,7 @@ class Field  {
          div.style.left = w[0] * this.unit + "px";
          div.style.top = w[1] * this.unit + "px";
 
-         this.field.append(div);
+         this.field.appendChild(div);
          return div;
      }
 
