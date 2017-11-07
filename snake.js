@@ -594,7 +594,7 @@ class Field  {
              span.className = "fail";
              span.innerHTML = "You're Failed";
          }
-         this.field.append(span);
+         this.field.appendChild(span);
      }
 
 
