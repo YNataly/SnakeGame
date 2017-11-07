@@ -51,20 +51,24 @@ position: absolute;
 .snake {
     position: absolute;
     background: url("images/body.png") 0% / 20px no-repeat;
+    -webkit-transition: left 1s linear, top 1s linear;
     transition: left 1s linear, top 1s linear;
 }
 
 
 .snake-tail[data-direction="top"], .snake-head[data-direction="top"] {
-transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
 }
 
 .snake-tail[data-direction="bottom"], .snake-head[data-direction="bottom"] {
-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
 }
 
 .snake-tail[data-direction="left"], .snake-head[data-direction="left"] {
-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 .win, .fail, .round-completed {
@@ -98,6 +102,10 @@ background: linear-gradient(0deg, rgba(209, 244, 14, 0.86), rgba(209, 246, 8, 0.
 
 }
 
+
+.controls.hide {
+display: none;
+}
 
 .controls, #cont {
      text-align:center;
@@ -156,13 +164,15 @@ background: linear-gradient(0deg, rgba(209, 244, 14, 0.86), rgba(209, 246, 8, 0.
     vertical-align: middle;
     }
 
-    .controls .arr.left {
-    transform: rotate(-90deg);
-    }
+ .controls .arr.left {
+       transform: rotate(-90deg);
+       -webkit-transform: rotate(-90deg);
+        }
 
-    .controls .arr.right {
-    transform: rotate(90deg);
-    }
+ .controls .arr.right {
+      -webkit-transform: rotate(90deg);
+      transform: rotate(90deg);
+        }
 
     .controls .pause {
     margin-right: auto;

@@ -4,6 +4,9 @@
         //callback(prevInterval, newInterval, pauseSum)
         //all time in ms
 
+        this.tmArr = [];
+        this.minInterval = 100;
+
         this.interval = interval;
         this.updateInterval = updateInterval;
 
@@ -11,7 +14,6 @@
         this.thisArg = thisArg;
 
         this._pause = false;
-        this.tm = null;
 
         this._stop = true;
         this.decStep = +decStep || 50;
@@ -25,11 +27,17 @@
         this.decrement = 0;
         this._decSpeed = false;
 
+        let tm;
+        for (tm of this.tmArr) {
+            clearTimeout(tm);
+        }
+        this.tmArr.length = 0;
+
         this.pauseCount = 0;
         this.executionInterval = -1;
         this._stop = false;;
-        this._start =this.current= Date.now();
-        this._oneStep();
+        this._start = this.current = Date.now();
+        this.tmArr.push(setTimeout(() => this._oneStep(), 0));
     }
 
     get isStop() {
@@ -38,10 +46,11 @@
 
     stop() {
         this._stop = true;
-        if (this.tm) {
-            clearTimeout(this.tm);
-            this.tm = null;
+        let tm;
+        for(tm of this.tmArr) {
+            clearTimeout(tm);
         }
+        this.tmArr.length = 0;
     }
 
 
@@ -63,8 +72,8 @@
             this.pauseCount = 0;
             this._start = this.current;
 
-            newInterval = Math.max(this.interval - this.decrement, 0);
-            this.interval=Math.max(this.changeInterval.call(this.thisArg, this.interval), 0);
+            newInterval = Math.max(this.interval - this.decrement, this.minInterval);
+            this.interval = Math.max(this.changeInterval.call(this.thisArg, this.interval), this.minInterval);
             newInterval = Math.min(newInterval, this.interval);
 
             if (this._decSpeed && this.decrement > 0) {
@@ -77,7 +86,7 @@
             }
         }
         else if (this.decrement) {
-            newInterval = Math.max(this.interval - this.decrement, 0);
+            newInterval = Math.max(this.interval - this.decrement, this.minInterval);
 
             if (this._decSpeed && this.decrement > 0) {
                 if (newInterval > 200)
@@ -95,7 +104,8 @@
           this.callback.call(this.thisArg,  newInterval);
 
           //console.log("setTimeout: newInterval=" + newInterval + " interval=" + this.interval + " dec=" + this.decrement + " , _decSpeed=" + this._decSpeed);
-        this.tm = setTimeout(() =>  this._oneStep(), newInterval);
+          this.tmArr.shift();
+          this.tmArr.push(setTimeout(() => this._oneStep(), newInterval));
     }
 
     decSpeed() {
@@ -109,7 +119,7 @@
             this._decSpeed = false;
 
         let newDec = this.decrement + this.decStep;
-        if (newDec<this.interval)
+        if (newDec+this.minInterval<this.interval)
            this.decrement= newDec;
         //console.log("Up: newInterval=" + (this.interval - this.decrement));
     }
@@ -122,10 +132,11 @@
         if(this.isStop) return;
 
         this._pause = true;
-        if (this.tm) {
-            clearTimeout(this.tm);
-            this.tm = null;
+        let tm;
+        for (tm of this.tmArr) {
+            clearTimeout(tm);
         }
+        this.tmArr.length = 0;
 
         this.pauseStart = Date.now();
      //   console.log("\tpause: pauseTime=" + this.pauseCount +" , executionInterval=" + this.executionInterval+ " , interval=" + this.interval);
@@ -141,16 +152,16 @@
 
         if (this.executionInterval < 0)
             this.executionInterval = Math.max(this.interval - (this.pauseStart - this.current),0);
-        else this.executionInterval = Math.max(this.executionInterval - (this.pauseStart - this.current));
+        else this.executionInterval = Math.max(this.executionInterval - (this.pauseStart - this.current), 0);
 
        // console.log("\tresume: pauseTime=" + this.pauseCount + " , executionInterval=" + this.executionInterval + " , interval=" + this.interval);
 
 
         this.current = Date.now();
-        this.tm = setTimeout(() => {
+        this.tmArr.push(setTimeout(() => {
           //  this.callback.call(this.thisArg, this.executionInterval, this.executionInterval, this.pauseCount);
             this._oneStep();
-        }, this.executionInterval);
+        }, this.executionInterval));
 
     }
 

@@ -6,7 +6,7 @@ class Game {
         //round
         this.roundsNumber=Game.Snake.length || 1;
         this.round=0;
-        this.roundStartInterval=800; //ms
+        this.roundStartInterval=700; //ms
 
         this.leftBtn=document.getElementById("leftBtn");
         this.rightBtn=document.getElementById("rightBtn");
@@ -17,12 +17,12 @@ class Game {
         this.cont=document.getElementById("cont");
         this.contBtn=document.getElementById("contBtn");
 
-        this.keyLeftObj={code:'ArrowLeft'};
-        this.keyRightObj={code:'ArrowRight'};
-        this.keyUpObj={code:'ArrowUp'};
+        this.keyLeftObj={key:'ArrowLeft'};
+        this.keyRightObj={key:'ArrowRight'};
+        this.keyUpObj={key:'ArrowUp'};
 
         this.pauseObj={code:"KeyP"};
-        this.enterObj={code:"Enter"};
+        this.enterObj={key:"Enter"};
 
        
         this.speedKey={isPressed: false, tm: null, ti: null};
@@ -41,7 +41,7 @@ class Game {
 
     createGame({walls, targets, fieldWidth=30, fieldHeight=30, unitSize=20, snake:snake={}}={}) {
         this.pauseBtn.classList.remove("on");
-        this.controls.hidden=false;
+        this.controls.classList.remove("hide");
 
         this.interval=this.roundStartInterval; //ms
       
@@ -74,7 +74,9 @@ class Game {
     setStartHandler(){
         this.runGame=this.startGame;
         document.addEventListener("keydown", this.EnterKeyHandler);
-        document.getElementById("startBtn").onclick=()=> this._onEnter(this.enterObj);
+        let startBtn = document.getElementById("startBtn");
+        startBtn.onclick = () => this._onEnter(this.enterObj);
+        startBtn.focus();
     }
 
     startGame() {
@@ -146,9 +148,9 @@ class Game {
     updateSpeedInterval(interval) 
     {
         if (interval > 600)
-            interval -= 50;
+            interval -= 20;
         else if (interval > 250)
-            interval -= 40;
+            interval -= 10;
 
         if (interval <= 250) {
             interval = 250;
@@ -207,7 +209,7 @@ class Game {
                     this.incSpeedBtn.removeEventListener("touchend",this.longPressUpHandler);
                     break;
                 case "keyup": 
-                    if(event && event.code!=="ArrowUp") return;
+                    if(event && event.key!=="ArrowUp" && event.key!=="Up") return;
                      document.removeEventListener("keyup", this.longPressUpHandler);
                     break;
             }
@@ -230,8 +232,8 @@ class Game {
 
 
     _onKeyDown(event) {
-       
-        if (event.code === "KeyP") { 
+      
+        if ((event.code && event.code === "KeyP") || (!event.code && event.keyCode && event.keyCode===80)) { 
             if (event.preventDefault) 
                 event.preventDefault();
 
@@ -245,17 +247,17 @@ class Game {
         
         if (this.timer.isPause) return;
 
-        if (event.code === "ArrowUp") { this._onPress(event); return;}
+        if (event.key === "ArrowUp" || event.key==="Up") { this._onPress(event); return;}
 
         if (!this.snake.canTurn) return;
 
-        if (event.code === 'ArrowRight' || event.code === 'Numpad6')
+        if (event.key === 'ArrowRight' || event.key === 'Right' || event.code && event.code === 'Numpad6' || !event.code && event.keyCode && event.keyCode === 102)
         { if (event.preventDefault) 
             event.preventDefault();
         
            this.snake.canTurn = false; this.snake.turnRight(); }
         
-        else if (event.code === 'ArrowLeft' || event.code === 'Numpad4')
+        else if (event.key === 'ArrowLeft' || event.key === 'Left' || event.code && event.code === 'Numpad4' || !event.code && event.keyCode && event.keyCode === 100)
         { if (event.preventDefault) 
               event.preventDefault();
         
@@ -265,7 +267,7 @@ class Game {
 
 
     _onEnter(event) {
-        if (event.code==='Enter') {
+        if (event.key==='Enter') {
             document.removeEventListener("keydown", this.EnterKeyHandler);
             this.runGame();
         }
@@ -312,7 +314,7 @@ class Game {
     gameOver(isSuccess) {
         this.timer.stop();
 
-        this.controls.hidden=true;
+        this.controls.classList.add("hide");
         document.removeEventListener("keydown", this.keyDownHandler);
        
         this._onUp(); //remove inc speed if exists
@@ -323,7 +325,7 @@ class Game {
             if(this.round===this.roundsNumber) { //saveYourName
                 return;}
             
-            if (this.roundStartInterval>=600) this.roundStartInterval-=30;} 
+            if (this.roundStartInterval>=600) this.roundStartInterval-=20;} 
 
         document.addEventListener("keydown", this.EnterKeyHandler);
         this.cont.classList.remove("hide");
@@ -584,7 +586,7 @@ class Field  {
          if (isSuccess) {
              if(finishedRound===roundsNumber){
                  span.className = "win";
-                 span.innerHTML = "<span>Congratulations!</span><span style='display:inline-block;'>You're WIN!</span>";}
+                 span.innerHTML = "<span>Congratulations!</span><span style='display:inline-block;'>You're WINNER!</span>";}
              else {
                  span.className = "round-completed";
                  span.innerHTML ="Round " + finishedRound + " completed!";
@@ -592,7 +594,7 @@ class Field  {
          }
          else {
              span.className = "fail";
-             span.innerHTML = "You're Failed";
+             span.innerHTML = "You Failed";
          }
          this.field.appendChild(span);
      }
